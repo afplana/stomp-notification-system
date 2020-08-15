@@ -1,14 +1,15 @@
 package com.bg.af.websocketdemo;
 
-import java.time.OffsetDateTime;
+import lombok.Value;
 
-public class Message {
+import java.io.Serializable;
+
+@Value
+public class Message implements Serializable {
 
     String text;
-    OffsetDateTime time;
 
-    public Message(String text, OffsetDateTime time) {
+    public Message(String text) {
         this.text = text;
-        this.time = time;
     }
 }

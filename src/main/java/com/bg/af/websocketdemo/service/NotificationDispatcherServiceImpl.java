@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -22,7 +21,7 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class NotificationDispatcherServiceImpl implements NotificationDispatcherService {
 
-    private static final String EVENT_DESTINATION = "/notification/event";
+    private static final String EVENT_DESTINATION = "/topic/notifications";
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     private final SimpMessagingTemplate messagingTemplate;
@@ -37,11 +36,13 @@ public class NotificationDispatcherServiceImpl implements NotificationDispatcher
             headerAccessor.setSessionId(session);
             headerAccessor.setLeaveMutable(true);
 
+            Message message = messageSupplier.get();
+            log.info(message.getText());
             messagingTemplate
                     .convertAndSendToUser(
                             session,
                             EVENT_DESTINATION,
-                            messageSupplier.get(),
+                            message,
                             headerAccessor.getMessageHeaders()
                     );
         });
@@ -70,6 +71,6 @@ public class NotificationDispatcherServiceImpl implements NotificationDispatcher
             int index = new Random().nextInt(ALPHABET.length());
             text.append(ALPHABET.charAt(index));
         }
-        return new Message(text.toString(), OffsetDateTime.now());
+        return new Message(text.toString());
     };
 }
